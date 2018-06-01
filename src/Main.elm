@@ -16,9 +16,19 @@ main =
         }
 
 
+type alias History =
+    List Int
+
+
+historyEntry : Int -> Html Msg
+historyEntry i =
+    li [] [ span [] [ text (toString i) ] ]
+
+
 type alias Model =
     { dieFace : Int
     , dieSides : Int
+    , history : History
     }
 
 
@@ -29,6 +39,8 @@ view model =
             [ h1 [] [ text (toString model.dieFace) ]
             , button [ onClick Roll ] [ text "Roll" ]
             ]
+        , div [ class "col-3 mx-auto" ]
+            [ ul [] (List.map historyEntry model.history) ]
         ]
 
 
@@ -44,9 +56,9 @@ update msg model =
             ( model, Random.generate NewFace (Random.int 1 model.dieSides) )
 
         NewFace newFace ->
-            ( { model | dieFace = newFace }, Cmd.none )
+            ( { model | dieFace = newFace, history = newFace :: model.history }, Cmd.none )
 
 
 init : ( Model, Cmd Msg )
 init =
-    ( Model 1 6, Cmd.none )
+    ( Model 1 6 [], Cmd.none )
