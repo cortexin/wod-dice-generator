@@ -1,6 +1,7 @@
 var path = require('path')
 
 module.exports = {
+    mode: 'development',
     entry: {
         app: [
             './src/index.js'
@@ -17,7 +18,7 @@ module.exports = {
                 use: [
                     'style-loader',
                     'css-loader',
-                ],
+                ]
             },
             {
                 test: /\.html$/,
@@ -35,7 +36,7 @@ module.exports = {
             {
                 test: /\.elm$/,
                 exclude: [/elm-stuff/, /node_modules/],
-                loader: 'elm-webpack-loader?verbose=true&ward=true'
+                loader: 'elm-webpack-loader?verbose=true&warn=true'
             },
         ],
         noParse: /\.elm$/,
@@ -45,4 +46,6 @@ module.exports = {
         inline: true,
         stats: { colors: true },
     },
+
+    resolve: { modules: ['node_modules'] },
 }

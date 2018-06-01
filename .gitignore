@@ -5,3 +5,4 @@ repl-temp-*
 
 # nmp stuff
 node_modules/
+dist

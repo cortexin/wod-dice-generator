@@ -1,7 +1,7 @@
 'use strict'
 
-require('ace-css/ace.css')
-require('font-awesome/css/font-awesome')
+require('ace-css/css/ace.css');
+require('font-awesome/css/font-awesome.css')
 
 require('./index.html')
 
