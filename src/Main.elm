@@ -25,8 +25,8 @@ type alias History =
     List HistoryEntry
 
 
-historyThrow : Int -> Int -> Html Msg
-historyThrow thresh i =
+historyRoll : Int -> Int -> Html Msg
+historyRoll thresh i =
     span
         [ class
             (if i >= thresh then
@@ -38,12 +38,38 @@ historyThrow thresh i =
         [ text ((toString i) ++ " ") ]
 
 
+checkRoll : Int -> Int -> Int -> Int
+checkRoll threshold roll aggregate =
+    case roll >= threshold of
+        True ->
+            aggregate + 1
+
+        False ->
+            if roll == 1 then
+                aggregate - 1
+            else
+                aggregate
+
+
+entryResult : Model -> HistoryEntry -> Html Msg
+entryResult model entry =
+    let
+        x =
+            List.foldr (checkRoll model.successThreshold) 0 entry
+    in
+        if x <= 0 then
+            span [ class "right red-text" ] [ text "FAIL" ]
+        else
+            span [ class "right teal-text" ] [ text (String.repeat x "★") ]
+
+
 historyEntry : Model -> HistoryEntry -> Html Msg
 historyEntry model entry =
-    li [ class "collection-item" ]
-        (List.map
-            (historyThrow model.successThreshold)
-            entry
+    li [ class "collection-item " ]
+        (List.concat
+            [ List.map (historyRoll model.successThreshold) entry
+            , [ entryResult model entry ]
+            ]
         )
 
 
@@ -114,7 +140,7 @@ view model =
 
 type Msg
     = Roll
-    | NewFace HistoryEntry
+    | NewRolls HistoryEntry
     | ChangeSides String
     | ChangeThreshold String
     | ChangeThrows String
@@ -144,10 +170,10 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         Roll ->
-            ( model, Random.generate NewFace (rollGenerator model.dieThrows model.dieSides) )
+            ( model, Random.generate NewRolls (rollGenerator model.dieThrows model.dieSides) )
 
-        NewFace newFace ->
-            ( { model | history = newFace :: model.history }, Cmd.none )
+        NewRolls rolls ->
+            ( { model | history = rolls :: model.history }, Cmd.none )
 
         ChangeSides newSides ->
             case toInt newSides of
