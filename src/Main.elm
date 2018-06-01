@@ -31,8 +31,10 @@ historyRoll thresh i =
         [ class
             (if i >= thresh then
                 "teal-text"
-             else
+             else if i == 1 then
                 "red-text"
+             else
+                "grey-text"
             )
         ]
         [ text ((toString i) ++ " ") ]
