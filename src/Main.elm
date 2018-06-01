@@ -27,14 +27,14 @@ type alias History =
 
 historyEntry : HistoryEntry -> Html Msg
 historyEntry i =
-    li [] [ span [] [ text (toString i) ] ]
+    li [ class "collection-item" ] [ text (String.concat (List.map toString i)) ]
 
 
 dieInput : Model -> Html Msg
 dieInput model =
-    div [ class "clearfix" ]
-        [ div [ class "col col-6" ] [ input [ placeholder "№ of sides", type_ "number", onInput ChangeSides ] [ text (toString model.dieSides) ] ]
-        , div [ class "col col-6" ] [ button [ onClick Roll ] [ text "Roll" ] ]
+    div [ class "row" ]
+        [ div [ class "col s6" ] [ input [ placeholder "№ of sides", type_ "number", onInput ChangeSides ] [ text (toString model.dieSides) ] ]
+        , div [ class "col s6" ] [ button [ class "btn", onClick Roll ] [ text "Roll" ] ]
         ]
 
 
@@ -47,10 +47,9 @@ type alias Model =
 
 view : Model -> Html Msg
 view model =
-    div [ class "clearfix mxn2" ]
-        [ div [ class "col-3 mx-auto" ] [ dieInput model ]
-        , div [ class "col-3 mx-auto" ]
-            [ ul [] (List.map historyEntry model.history) ]
+    div [ class "container" ]
+        [ dieInput model
+        , ul [ class "collection" ] (List.map historyEntry model.history)
         ]
 
 
