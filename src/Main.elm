@@ -17,11 +17,15 @@ main =
         }
 
 
-type alias History =
+type alias HistoryEntry =
     List Int
 
 
-historyEntry : Int -> Html Msg
+type alias History =
+    List HistoryEntry
+
+
+historyEntry : HistoryEntry -> Html Msg
 historyEntry i =
     li [] [ span [] [ text (toString i) ] ]
 
@@ -35,8 +39,8 @@ dieInput model =
 
 
 type alias Model =
-    { dieFace : Int
-    , dieSides : Int
+    { dieSides : Int
+    , numDice : Int
     , history : History
     }
 
@@ -52,18 +56,23 @@ view model =
 
 type Msg
     = Roll
-    | NewFace Int
+    | NewFace HistoryEntry
     | ChangeSides String
+
+
+rollGenerator : Int -> Int -> Random.Generator (List Int)
+rollGenerator len sides =
+    Random.list len (Random.int 1 sides)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         Roll ->
-            ( model, Random.generate NewFace (Random.int 1 model.dieSides) )
+            ( model, Random.generate NewFace (rollGenerator model.numDice model.dieSides) )
 
         NewFace newFace ->
-            ( { model | dieFace = newFace, history = newFace :: model.history }, Cmd.none )
+            ( { model | history = newFace :: model.history }, Cmd.none )
 
         ChangeSides newSides ->
             case toInt newSides of
@@ -76,4 +85,4 @@ update msg model =
 
 init : ( Model, Cmd Msg )
 init =
-    ( Model 1 6 [], Cmd.none )
+    ( Model 6 4 [], Cmd.none )
