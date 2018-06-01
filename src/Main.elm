@@ -3,6 +3,7 @@ module Main exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (class)
 import Html.Events exposing (onClick)
+import Random
 
 
 main : Program Never Model Msg
@@ -17,6 +18,7 @@ main =
 
 type alias Model =
     { dieFace : Int
+    , dieSides : Int
     }
 
 
@@ -32,15 +34,19 @@ view model =
 
 type Msg
     = Roll
+    | NewFace Int
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         Roll ->
-            ( model, Cmd.none )
+            ( model, Random.generate NewFace (Random.int 1 model.dieSides) )
+
+        NewFace newFace ->
+            ( { model | dieFace = newFace }, Cmd.none )
 
 
 init : ( Model, Cmd Msg )
 init =
-    ( Model 1, Cmd.none )
+    ( Model 1 6, Cmd.none )
