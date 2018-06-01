@@ -49,7 +49,7 @@ historyEntry model entry =
 
 successThresholdInput : Model -> Html Msg
 successThresholdInput model =
-    div [ class "col s4" ]
+    div [ class "col s3" ]
         [ label [] [ text "Success Threshold" ]
         , input
             [ type_ "number"
@@ -60,9 +60,22 @@ successThresholdInput model =
         ]
 
 
+numThrowsInput : Model -> Html Msg
+numThrowsInput model =
+    div [ class "col s3" ]
+        [ label [] [ text "№ of dies" ]
+        , input
+            [ type_ "number"
+            , onInput ChangeThrows
+            , value (toString model.dieThrows)
+            ]
+            []
+        ]
+
+
 numSidesInput : Model -> Html Msg
 numSidesInput model =
-    div [ class "col s4" ]
+    div [ class "col s3" ]
         [ label [] [ text "№ of sides" ]
         , input
             [ type_ "number"
@@ -78,14 +91,15 @@ dieInput model =
     div [ class "row" ]
         [ numSidesInput model
         , successThresholdInput model
-        , div [ class "col s4" ] [ button [ class "btn", onClick Roll ] [ text "Roll" ] ]
+        , numThrowsInput model
+        , div [ class "col s3" ] [ button [ class "btn", onClick Roll ] [ text "Roll" ] ]
         ]
 
 
 type alias Model =
     { dieSides : Int
     , successThreshold : Int
-    , numDice : Int
+    , dieThrows : Int
     , history : History
     }
 
@@ -103,6 +117,7 @@ type Msg
     | NewFace HistoryEntry
     | ChangeSides String
     | ChangeThreshold String
+    | ChangeThrows String
 
 
 rollGenerator : Int -> Int -> Random.Generator (List Int)
@@ -121,7 +136,7 @@ parseThreshold newThreshold model =
                 False ->
                     ( model, Cmd.none )
 
-        Result.Err msg ->
+        Result.Err _ ->
             ( model, Cmd.none )
 
 
@@ -129,7 +144,7 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         Roll ->
-            ( model, Random.generate NewFace (rollGenerator model.numDice model.dieSides) )
+            ( model, Random.generate NewFace (rollGenerator model.dieThrows model.dieSides) )
 
         NewFace newFace ->
             ( { model | history = newFace :: model.history }, Cmd.none )
@@ -144,6 +159,14 @@ update msg model =
 
         ChangeThreshold newThreshold ->
             parseThreshold newThreshold model
+
+        ChangeThrows newThrows ->
+            case toInt newThrows of
+                Result.Ok x ->
+                    ( { model | dieThrows = x }, Cmd.none )
+
+                Result.Err _ ->
+                    ( model, Cmd.none )
 
 
 init : ( Model, Cmd Msg )
